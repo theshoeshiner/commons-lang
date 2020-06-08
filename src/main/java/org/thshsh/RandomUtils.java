@@ -1,9 +1,14 @@
 package org.thshsh;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class RandomUtils {
+	
+	public static <T> T nextItem(T[] coll) {
+		return nextItem(Arrays.asList(coll));
+	}
 	
 	public static <T> T nextItem(Collection<T> coll) {
 		if(coll.size()==0)return null;
