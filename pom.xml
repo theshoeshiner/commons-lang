@@ -1,27 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.thshsh</groupId>
 	<artifactId>commons-lang</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-
+	<version>1.0.1-SNAPSHOT</version>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.25</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
-	<scm>
-		<url>https://github.com/theshoeshiner/commons-lang</url>
-		<connection>https://github.com/theshoeshiner/commons-lang.git</connection>
-		<developerConnection>The Shoe Shiner</developerConnection>
-	</scm>
-	<name>Commons Lang</name>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>thshsh-snapshots</id>
+			<url>http://www.thshsh.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>thshsh-releases</id>
+			<url>http://www.thshsh.org/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+	<description>Common Java language functions.</description>
 </project>

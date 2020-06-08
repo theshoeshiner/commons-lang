@@ -13,6 +13,10 @@ public class StoppableThread extends Thread {
 		this.interrupt();
 	}
 	
+	public void setStopped() {
+		this.setStopped(true);
+	}
+	
 	public static void sleepSafe(long ms) {
 		try {Thread.sleep(ms);} 
 		catch (InterruptedException e) {}
