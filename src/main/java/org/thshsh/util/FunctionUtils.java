@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 public class FunctionUtils {
 	
-	public static <T,R> Function<T,?> nested(Function<T, R> func,Function<R, ?> sub) {
+	public static <T,R,C> Function<T,C> nested(Function<T, R> func,Function<R, C> sub) {
 		return (t) -> {
 			R r = func.apply(t);
 			return sub.apply(r);
