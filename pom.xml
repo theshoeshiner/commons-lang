@@ -7,6 +7,18 @@
 	<version>1.1.0</version>
 	<url>https://github.com/theshoeshiner/commons-lang</url>
 	<name>Commons Lang</name>
+	<developers>
+		<developer>
+			<name>The Shoe Shiner</name>
+			<email>theshoeshiner@thshsh.org</email>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>APACHE LICENSE, VERSION 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -37,7 +49,6 @@
 		</dependency>
 	</dependencies>
 	<description>Common Java language functions</description>
-
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
