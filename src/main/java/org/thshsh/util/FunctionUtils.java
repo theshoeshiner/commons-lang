@@ -4,10 +4,18 @@ import java.util.function.Function;
 
 public class FunctionUtils {
 	
-	public static <T,R,C> Function<T,C> nested(Function<T, R> func,Function<R, C> sub) {
+	public static <A,B,Z> Function<A,Z> nested(Function<A,B> fstart,Function<B, Z> fend) {
 		return (t) -> {
-			R r = func.apply(t);
-			return sub.apply(r);
+			B r = fstart.apply(t);
+			return fend.apply(r);
+		};
+	}
+	
+	public static <A,B,C,Z> Function<A,Z> nested(Function<A,B> fstart,Function<B, C> f1,Function<C, Z> fend) {
+		return (t) -> {
+			B b = fstart.apply(t);
+			C c = f1.apply(b);
+			return fend.apply(c);
 		};
 	}
 

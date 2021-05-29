@@ -2,6 +2,7 @@ package org.thshsh.text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,32 +28,50 @@ public class CaseUtils {
 	public static String UNDERSCORE_CHAR = "_";
 
 	public static String toPascalCase(String original){
-		return toPascalCase(original, false);
+		return toPascalCase(original, false,null);
+	}
+	
+	public static String toPascalCase(String original,Consumer<String[]> transform){
+		return toPascalCase(original, false,transform);
+	}
+	
+	public static String toPascalCase(String original,Boolean space){
+		return toPascalCase(original, space,null);
 	}
 
-	public static String toPascalCase(String original,Boolean space){
-		String[] parts = getParts(original);
-		return generateCasedString(parts, space?SPACE_CHAR:EMPTY_CHAR, false, false, true,true);
+	public static String toPascalCase(String original,Boolean space,Consumer<String[]> transform){
+		return generateCasedString(original,transform, space?SPACE_CHAR:EMPTY_CHAR, false, false, true,true);
 	}
 
 
 	public static String toSnakeCase(String original){
-		String[] parts = getParts(original);
-		return generateCasedString(parts, UNDERSCORE_CHAR, false, true, false,false);
+		return generateCasedString(original,null, UNDERSCORE_CHAR, false, true, false,false);
+	}
+	
+	public static String toSnakeCase(String original,Consumer<String[]> transform){
+		return generateCasedString(original,transform, UNDERSCORE_CHAR, false, true, false,false);
 	}
 
 	public static String toCamelCase(String original){
-		String[] parts = getParts(original);
-		return generateCasedString(parts, EMPTY_CHAR, false, true, true,false);
+		return generateCasedString(original,null, EMPTY_CHAR, false, true, true,false);
+	}
+	
+	public static String toCamelCase(String original,Consumer<String[]> transform){
+		return generateCasedString(original,transform, EMPTY_CHAR, false, true, true,false);
 	}
 
 	public static String toKebabCase(String original){
-		String[] parts = getParts(original);
-		return generateCasedString(parts, DASH_CHAR, false, true, false,false);
+		return generateCasedString(original,null, DASH_CHAR, false, true, false,false);
+	}
+	
+	public static String toKebabCase(String original,Consumer<String[]> transform){
+		return generateCasedString(original,transform, DASH_CHAR, false, true, false,false);
 	}
 
-	public static String generateCasedString(String[] parts,String sep,boolean upper,boolean lower,boolean camel){
-		return generateCasedString(parts, sep, upper, lower, camel, false);
+
+	public static String generateCasedString(String original,Consumer<String[]> transform,String sep,boolean upper,boolean lower,boolean camel,boolean first){
+		String[] parts = getParts(original);
+		return generateCasedString(parts, transform,sep, upper, lower, camel, first);
 	}
 
 	/**
@@ -65,13 +84,21 @@ public class CaseUtils {
 	 * @param first
 	 * @return
 	 */
-	public static String generateCasedString(String[] parts,String sep,boolean upper,boolean lower,boolean camel,boolean first){
-		StringBuilder sb = new StringBuilder();
+	public static String generateCasedString(String[] parts,Consumer<String[]> transform,String sep,boolean upper,boolean lower,boolean camel,boolean first){
+		
 		for(int i=0;i<parts.length;i++){
 			String p = parts[i];
 			if(upper)p = p.toUpperCase();
 			if(lower)p = p.toLowerCase();
 			if( (camel && i>0) || first)p = p.substring(0, 1).toUpperCase()+p.substring(1).toLowerCase();
+			parts[i] = p;
+		}
+
+		if(transform!=null) transform.accept(parts);
+		
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<parts.length;i++){
+			String p = parts[i];
 			sb.append(p);
 			if((i+1)<parts.length) sb.append(sep);
 		}
