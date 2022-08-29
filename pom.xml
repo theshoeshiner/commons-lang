@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.thshsh</groupId>
 	<artifactId>commons-lang</artifactId>
-	<version>1.3.0</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<url>https://github.com/theshoeshiner/commons-lang</url>
 	<name>Commons Lang</name>
 	<developers>
