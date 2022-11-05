@@ -14,6 +14,7 @@ public class MathUtilsTest {
 		Assert.assertEquals(6,MathUtils.significantDigits("101.202"));
 		Assert.assertEquals(4,MathUtils.significantDigits("101.0"));
 		Assert.assertEquals(3,MathUtils.significantDigits("101"));
+		Assert.assertEquals(1,MathUtils.significantDigits("100"));
 		Assert.assertEquals(3,MathUtils.significantDigits("1010"));
 		Assert.assertEquals(3,MathUtils.significantDigits("001010"));
 		Assert.assertEquals(4,MathUtils.significantDigits("001234000"));

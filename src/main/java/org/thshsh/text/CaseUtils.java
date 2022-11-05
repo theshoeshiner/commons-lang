@@ -12,9 +12,10 @@ public class CaseUtils {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(CaseUtils.class);
 
 
-	//Splits on caps, except first, so it works for camel case and proper case
-	//This will combine strings of caps like abbreviations, but that breaks camel case strings
-	public static String REGEX_NOT_FIRST_UC_CHAR = "(?<=.)(?<!(\\p{Upper}))(?=(\\p{Upper}+))";
+	//Splits on caps, except first, so it works for camel case and pascal case
+	//This will combine strings of caps like abbreviations, 
+	//but that breaks camel case strings which consider multiple caps to be separate tokens
+	public static String REGEX_NOT_FIRST_UC_CHAR = "(?<=.)(?<!([A-Z0-9]))(?=([A-Z]+))";
 	//splits on whitespace
 	public static String REGEX_SP_CHAR = "(\\s++)";
 	//splits on underscore
@@ -39,6 +40,10 @@ public class CaseUtils {
 		return toPascalCase(original, space,null);
 	}
 
+	public static String toPascalCaseWithSpaces(String original){
+		return toPascalCase(original, true,null);
+	}
+	
 	public static String toPascalCase(String original,Boolean space,Consumer<String[]> transform){
 		return generateCasedString(original,transform, space?SPACE_CHAR:EMPTY_CHAR, false, false, true,true);
 	}
@@ -107,12 +112,12 @@ public class CaseUtils {
 
 
 	public static String[] getParts(String original){
-
 		String[] parts = original.split(REGEX_NOT_FIRST_UC_CHAR+"|"+REGEX_SP_CHAR+"|"+REGEX_US_CHAR+"|"+REGEX_DASH_CHAR);
 		List<String> keep = new ArrayList<String>();
 		for(String part : parts){
 			if(part != null && !part.equals(EMPTY_CHAR)) keep.add(part);
 		}
+		LOGGER.trace("Tokens: {}",keep);
 		return keep.toArray(new String[keep.size()]);
 	}
 
