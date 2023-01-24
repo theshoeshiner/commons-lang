@@ -30,6 +30,14 @@ public class CaseUtilsTest {
 	}
 	
 	@Test
+	public void testSpecial() {
+		String out = CaseUtils.toSnakeCase("g/dL".replaceAll("\\W", "_").toUpperCase());
+		LOGGER.info("out: {}",out);
+		
+		
+	}
+	
+	@Test
 	public void testTransformer() {
 
 		String source = "with-id";
