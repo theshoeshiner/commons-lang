@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * @deprecated use java Comparator.then
+ */
+@Deprecated
 public class MultiComparator<T> implements Comparator<T> {
     private final List<Comparator<T>> comparators;
 

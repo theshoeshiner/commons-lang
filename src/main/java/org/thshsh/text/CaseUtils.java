@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class CaseUtils {
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(CaseUtils.class);
@@ -45,7 +46,7 @@ public class CaseUtils {
 	}
 	
 	public static String toPascalCase(String original,Boolean space,Consumer<String[]> transform){
-		return generateCasedString(original,transform, space?SPACE_CHAR:EMPTY_CHAR, false, false, true,true);
+		return generateCasedString(original,transform, space?SPACE_CHAR:EMPTY_CHAR, false, false, true,false);
 	}
 
 
@@ -56,14 +57,18 @@ public class CaseUtils {
 	public static String toSnakeCase(String original,Consumer<String[]> transform){
 		return generateCasedString(original,transform, UNDERSCORE_CHAR, false, true, false,false);
 	}
+	
 
+	
 	public static String toCamelCase(String original){
-		return generateCasedString(original,null, EMPTY_CHAR, false, true, true,false);
+		return generateCasedString(original,null, EMPTY_CHAR, false, true, true,true);
 	}
 	
 	public static String toCamelCase(String original,Consumer<String[]> transform){
-		return generateCasedString(original,transform, EMPTY_CHAR, false, true, true,false);
+		return generateCasedString(original,transform, EMPTY_CHAR, false, true, true,true);
 	}
+	
+	
 
 	public static String toKebabCase(String original){
 		return generateCasedString(original,null, DASH_CHAR, false, true, false,false);
@@ -74,28 +79,28 @@ public class CaseUtils {
 	}
 
 
-	public static String generateCasedString(String original,Consumer<String[]> transform,String sep,boolean upper,boolean lower,boolean camel,boolean first){
+	public static String generateCasedString(String original,Consumer<String[]> transform,String sep,boolean uppercase,boolean lowercase,boolean upperFirstChar,boolean skipUpperFirstCharFirstPart){
 		String[] parts = getParts(original);
-		return generateCasedString(parts, transform,sep, upper, lower, camel, first);
+		return generateCasedString(parts, transform,sep, uppercase, lowercase, upperFirstChar, skipUpperFirstCharFirstPart);
 	}
 
-	/**
-	 *
-	 * @param parts
-	 * @param sep
-	 * @param upper
-	 * @param lower
-	 * @param camel - means that we are making all parts after the first start with capital eg: Test
-	 * @param first
+    /**
+	 * skipUpperFirstCharFirstPart upperFirstChar
+	 * @param parts String parts
+	 * @param sep Separator between parts
+	 * @param uppercase uppercase all parts
+	 * @param lowercase lowercase all parts
+	 * @param upperFirstChar upper case the first character of each part
+	 * @param skipUpperFirstCharFirstPart lower case the entire first part
 	 * @return
 	 */
-	public static String generateCasedString(String[] parts,Consumer<String[]> transform,String sep,boolean upper,boolean lower,boolean camel,boolean first){
+	public static String generateCasedString(String[] parts,Consumer<String[]> transform,String sep,boolean uppercase,boolean lowercase,boolean upperFirstChar,boolean skipUpperFirstCharFirstPart){
 		
 		for(int i=0;i<parts.length;i++){
 			String p = parts[i];
-			if(upper)p = p.toUpperCase();
-			if(lower)p = p.toLowerCase();
-			if( (camel && i>0) || first)p = p.substring(0, 1).toUpperCase()+p.substring(1).toLowerCase();
+			if(uppercase)p = p.toUpperCase();
+			else if(lowercase)p = p.toLowerCase();
+			if(upperFirstChar && (!skipUpperFirstCharFirstPart || i>0)) p = p.substring(0, 1).toUpperCase()+p.substring(1).toLowerCase();
 			parts[i] = p;
 		}
 
@@ -117,7 +122,7 @@ public class CaseUtils {
 		for(String part : parts){
 			if(part != null && !part.equals(EMPTY_CHAR)) keep.add(part);
 		}
-		LOGGER.trace("Tokens: {}",keep);
+		LOGGER.info("Tokens: {}",keep);
 		return keep.toArray(new String[keep.size()]);
 	}
 
