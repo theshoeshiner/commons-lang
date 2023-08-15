@@ -23,15 +23,38 @@ public class CaseUtilsTest {
 	}
 	
 	@Test
-	public void testWithNumber() {
+	public void test2() {
+
+		assertAllRecursive("aBC","a-b-c","A-B-C","ABC","A B C","a_b_c","A_B_C");
+				
+	}
+	
+	@Test
+	public void testregex() {
 		
+		//first part is a group of prefix
+		//second group is negative look behind for single capital letter or numbers
+		//3rd group is lookahead for any capital letters
+		String REGEX_NOT_FIRST_UC_CHAR = "(?<=.)(?<!([A-Z0-9]))(?=([A-Z]+))";
+		
+		String camel = "aBC";
+		String[] parts = camel.split(REGEX_NOT_FIRST_UC_CHAR);
+		LOGGER.info("parts: {}",new Object[] {parts});
+				
+	}
+	
+	@Test
+	public void testWithNumber() {
+		 
 		assertAllRecursive("myV4rName","my-v4r-name","MY-V4R-NAME","MyV4rName","My V4r Name","my_v4r_name","MY_V4R_NAME");
 		
 	}
 	
 	@Test
 	public void testSpecial() {
-		String out = CaseUtils.toSnakeCase("g/dL".replaceAll("\\W", "_").toUpperCase());
+		String s = "g/dL".replaceAll("\\W", "_");
+		LOGGER.info("s: {}",s);
+		String out = CaseUtils.toSnakeCase(s.toUpperCase());
 		LOGGER.info("out: {}",out);
 		
 		
@@ -93,13 +116,14 @@ public class CaseUtilsTest {
 		for(int i=0;i<results.size();i++) {
 			try {
 				Function<String,String> f = funcs.get(i);
+				LOGGER.info("function: {}",i);
 				String r = results.get(i);
 				String ret = f.apply(original);
-				//LOGGER.info("Assert: {} = {}",r,ret);
+				LOGGER.info("Assert: {} = {}",r,ret);
 				Assert.assertEquals(r, ret);
 			}
 			catch(ComparisonFailure ae) {
-				//LOGGER.info("caught error");
+				LOGGER.info("caught error");
 				error = ae;
 			}
 		}
