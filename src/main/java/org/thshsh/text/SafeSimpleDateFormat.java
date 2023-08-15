@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @SuppressWarnings("serial")
+@Deprecated
 public class SafeSimpleDateFormat extends SimpleDateFormat {
 	
     private final String formatString;
