@@ -17,14 +17,7 @@ public class CompletablePromiseContext<V> {
 	
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     
-   /* public static void schedule(Runnable r) {
-        SERVICE.schedule(r, 500, TimeUnit.MILLISECONDS);
-    }
-    
-    public static void schedule(Runnable r,long ms) {
-        SERVICE.schedule(r, ms, TimeUnit.MILLISECONDS);
-    }
-    */
+
     protected long checkEvery = 1;
     protected List<CompletablePromise<V>> promises;
     
@@ -37,11 +30,6 @@ public class CompletablePromiseContext<V> {
     public void add(CompletablePromise<V> promise) {
     	promises.add(promise);
     }
-    
-    /*public CompletablePromiseContext(List<CompletablePromise<V>> p) {
-    	promises = Collections.synchronizedList(p);
-    	schedule();
-    }*/
     
     public void start() {
     	schedule();

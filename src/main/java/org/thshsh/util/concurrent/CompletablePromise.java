@@ -12,11 +12,10 @@ public class CompletablePromise<V> extends CompletableFuture<V> {
 	public static final Logger LOGGER = LoggerFactory.getLogger(CompletablePromise.class);
 	
     private Future<V> future;
-
+    
     public CompletablePromise(Future<V> future,CompletablePromiseContext<V> context) {
         this.future = future;
         context.add(this);
-        //CompletablePromiseContext.schedule(this::tryToComplete,ms);
     }
     
     public CompletablePromise(Future<V> future) {
@@ -24,12 +23,10 @@ public class CompletablePromise<V> extends CompletableFuture<V> {
         CompletablePromiseContext<V> context = new CompletablePromiseContext<>(1000);
         context.add(this);
         context.start();
-        //CompletablePromiseContext.schedule(this::tryToComplete);
     }
 
 
     protected boolean tryToComplete() {
-    	//LOGGER.info("tryToComplete");
     	
         if (future.isDone()) {
             try {
@@ -47,6 +44,5 @@ public class CompletablePromise<V> extends CompletableFuture<V> {
         }
         else return false;
 
-        //CompletablePromiseContext.schedule(this::tryToComplete);
     }
 }
