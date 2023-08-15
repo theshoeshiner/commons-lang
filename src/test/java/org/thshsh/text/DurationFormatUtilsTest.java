@@ -12,6 +12,7 @@ public class DurationFormatUtilsTest {
 		String format = "[d'd' ][H'h '][m'm '][s's']";
 		
 		String[] formats = {
+				"[H'h'm'm's's']",
 				"d'd 'H'h 'm'm 's's'",
 				"[d'd '][H'h '][m'm ']s's'",
 				"[d'd '][H'h '][m'm '][s's']",

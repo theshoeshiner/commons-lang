@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -49,6 +50,32 @@ import org.apache.commons.lang3.time.DateUtils;
  * Token values are printed using decimal digits.
  * A token character can be repeated to ensure that the field occupies a certain minimum
  * size. Values will be left-padded with 0 unless padding is disabled in the method invocation.
+ * <br>
+ * Tokens can be marked as optional by surrounding them with brackets [ ]. These tokens will
+ * only be printed if the token value is non-zero. Literals within optional blocks will only be
+ * printed if the preceding non-literal token is non-zero. Leading optional literals will only
+ * be printed if the following non-literal is non-zero.
+ * Multiple optional blocks can be used to group literals with the desired token.
+ * <p>
+ * Notes on Optional Tokens:<br>
+ * <b>Multiple optional tokens without literals can result in impossible to understand output.</b><br>
+ * <b>Patterns where all tokens are optional can produce empty strings.</b><br>
+ * (See examples below)
+ * </p>
+ * <br>
+ * <table border="1">
+ * <caption>Example Output</caption>
+ * <tr><th>pattern</th><th>Duration.ofDays(1)</th><th>Duration.ofHours(1)</th><th>Duration.ofMinutes(1)</th><th>Duration.ZERO</th></tr>
+ * <tr><td>d'd'H'h'm'm's's'</td><td>1d0h0m0s</td><td>0d1h0m0s</td><td>0d0h1m0s</td><td>0d0h0m0s</td></tr>
+ * <tr><td>d'd'[H'h'm'm']s's'</td><td>1d0s</td><td>0d1h0s</td><td>0d1m0s</td><td>0d0s</td></tr>
+ * <tr><td>[d'd'H'h'm'm']s's'</td><td>1d0s</td><td>1h0s</td><td>1m0s</td><td>0s</td></tr>
+ * <tr><td>[d'd'H'h'm'm's's']</td><td>1d</td><td>1h</td><td>1m</td><td></td></tr>
+ * <tr><td>['{'d'}']HH':'mm</td><td>{1}00:00</td><td>01:00</td><td>00:01</td><td>00:00</td></tr>
+ * <tr><td>['{'dd'}']['&lt;'HH'&gt;']['('mm')']</td><td>{01}</td><td>&lt;01&gt;</td><td>(00)</td><td></td></tr>
+ * <tr><td>[dHms]</td><td>1</td><td>1</td><td>1</td><td></td></tr>
+ * </table>
+ * <b>Note: Optional blocks cannot be nested.</b>
+ *
  * @since 2.1
  */
 public class DurationFormatUtils {
@@ -425,47 +452,70 @@ public class DurationFormatUtils {
         final StringBuilder buffer = new StringBuilder();
         boolean lastOutputSeconds = false;
         boolean lastOutputZero = false;
-        boolean optional = false;
+        int optionalStart = -1;
+        boolean firstOptionalNonLiteral = false;
+        int optionalIndex = -1;
+        boolean inOptional = false;
         for (final Token token : tokens) {
             final Object value = token.getValue();
+            final boolean isLiteral = value instanceof StringBuilder;
             final int count = token.getCount();
-            optional = token.optional;
-            if (value instanceof StringBuilder) {
-                if (!optional || !lastOutputZero)
-                    buffer.append(value.toString());
+            if (optionalIndex != token.optionalIndex) {
+              optionalIndex = token.optionalIndex;
+              if (optionalIndex > -1) {
+                //entering new optional block
+                optionalStart = buffer.length();
+                lastOutputZero = false;
+                inOptional = true;
+                firstOptionalNonLiteral = false;
+              } else {
+                //leaving optional block
+                inOptional = false;
+              }
+            }
+            if (isLiteral) {
+               if (!inOptional || !lastOutputZero) {
+                     buffer.append(value.toString());
+               }
             } else if (value.equals(y)) {
                 lastOutputSeconds = false;
                 lastOutputZero = years == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(years, padWithZeros, count));
+                }
             } else if (value.equals(M)) {
                 lastOutputSeconds = false;
                 lastOutputZero = months == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(months, padWithZeros, count));
+                }
             } else if (value.equals(d)) {
                 lastOutputSeconds = false;
                 lastOutputZero = days == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(days, padWithZeros, count));
+                }
             } else if (value.equals(H)) {
                 lastOutputSeconds = false;
                 lastOutputZero = hours == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(hours, padWithZeros, count));
+                }
             } else if (value.equals(m)) {
                 lastOutputSeconds = false;
                 lastOutputZero = minutes == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(minutes, padWithZeros, count));
+                }
             } else if (value.equals(s)) {
                 lastOutputSeconds = true;
                 lastOutputZero = seconds == 0;
-                if (!optional || !lastOutputZero)
+                if (!inOptional || !lastOutputZero) {
                     buffer.append(paddedValue(seconds, padWithZeros, count));
+                }
             } else if (value.equals(S)) {
                 lastOutputZero = milliseconds == 0;
-                if (!optional || !lastOutputZero) {
+                if (!inOptional || !lastOutputZero) {
                     if (lastOutputSeconds) {
                         // ensure at least 3 digits are displayed even if padding is not selected
                         final int width = padWithZeros ? Math.max(3, count) : 3;
@@ -475,6 +525,13 @@ public class DurationFormatUtils {
                     }
                 }
                 lastOutputSeconds = false;
+            }
+            //as soon as we hit first nonliteral in optional, check for literal prefix
+            if (inOptional && !isLiteral && !firstOptionalNonLiteral){
+                firstOptionalNonLiteral = true;
+                if (lastOutputZero) {
+                    buffer.delete(optionalStart, buffer.length());
+                }
             }
         }
         return buffer.toString();
@@ -517,6 +574,7 @@ public class DurationFormatUtils {
         StringBuilder buffer = null;
         Token previous = null;
         boolean inOptional = false;
+        int optionalIndex = -1;
         for (int i = 0; i < format.length(); i++) {
             final char ch = format.charAt(i);
             if (inLiteral && ch != '\'') {
@@ -527,11 +585,16 @@ public class DurationFormatUtils {
             switch (ch) {
             // TODO: Need to handle escaping of '
             case '[':
-                if(inOptional) throw new IllegalArgumentException("Nested optional block at index: "+i);
+                if (inOptional) {
+                  throw new IllegalArgumentException("Nested optional block at index: "+i);
+                }
+                optionalIndex++;
                 inOptional = true;
                 break;
             case ']':
-                if(!inOptional) throw new IllegalArgumentException("Attempting to close unopened optional block at index: "+i);
+                if (!inOptional) {
+                  throw new IllegalArgumentException("Attempting to close unopened optional block at index: "+i);
+                }
                 inOptional = false;
                 break;
             case '\'':
@@ -540,7 +603,7 @@ public class DurationFormatUtils {
                     inLiteral = false;
                 } else {
                     buffer = new StringBuilder();
-                    list.add(new Token(buffer,inOptional));
+                    list.add(new Token(buffer, inOptional, optionalIndex));
                     inLiteral = true;
                 }
                 break;
@@ -568,7 +631,7 @@ public class DurationFormatUtils {
             default:
                 if (buffer == null) {
                     buffer = new StringBuilder();
-                    list.add(new Token(buffer,inOptional));
+                    list.add(new Token(buffer, inOptional, optionalIndex));
                 }
                 buffer.append(ch);
             }
@@ -577,7 +640,7 @@ public class DurationFormatUtils {
                 if (previous != null && previous.getValue().equals(value)) {
                     previous.increment();
                 } else {
-                    final Token token = new Token(value,inOptional);
+                    final Token token = new Token(value, inOptional, optionalIndex);
                     list.add(token);
                     previous = token;
                 }
@@ -614,34 +677,21 @@ public class DurationFormatUtils {
 
         private final Object value;
         private int count;
-        private boolean optional = false;
+        private int optionalIndex = -1;
 
-        Token(final Object value) {
-            this.value = value;
-            this.count = 1;
-        }
-        
         /**
          * Wraps a token around a value. A value would be something like a 'Y'.
          *
-         * @param value to wrap
+         * @param value value to wrap, non-null.
+         * @param optional whether the token is optional
+         * @param optionalIndex the index of the optional token within the pattern
          */
-        Token(final Object value, final boolean optional) {
-            this.value = value;
+        Token(final Object value, final boolean optional, final int optionalIndex) {
+            this.value = Objects.requireNonNull(value, "value");
             this.count = 1;
-            this.optional = optional;
-        }
-
-        /**
-         * Wraps a token around a repeated number of a value, for example it would
-         * store 'yyyy' as a value for y and a count of 4.
-         *
-         * @param value to wrap
-         * @param count to wrap
-         */
-        Token(final Object value, final int count) {
-            this.value = value;
-            this.count = count;
+            if (optional) {
+                this.optionalIndex = optionalIndex;
+            }
         }
 
         /**
@@ -663,7 +713,7 @@ public class DurationFormatUtils {
         /**
          * Gets the particular value this token represents.
          *
-         * @return Object value
+         * @return Object value, non-null.
          */
         Object getValue() {
             return value;
