@@ -22,18 +22,18 @@ package org.thshsh.text.cases;
  * KebabCase is a delimited case where the delimiter is a hyphen character '-'.
  * </p>
  */
-public class KebabCase extends DelimitedCase {
+public final class KebabCase extends CharacterDelimitedCase {
 
-    /** constant for delimiter. */
-    public static final char DELIMITER = '-';
+    /** Constant for delimiter. */
+    private static final char DELIMITER = '-';
 
-    /** constant reuseable instance of this case. */
+    /** Constant reusable instance of this case. */
     public static final KebabCase INSTANCE = new KebabCase();
 
     /**
      * Constructs a new KebabCase instance.
      */
-    public KebabCase() {
+    private KebabCase() {
         super(DELIMITER);
     }
 

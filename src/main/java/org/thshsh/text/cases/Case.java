@@ -19,8 +19,8 @@ package org.thshsh.text.cases;
 import java.util.List;
 
 /**
- * Handles formatting and parsing tokens to/from a String. For most implementations tokens returned
- * by the parse method should abide by any restrictions present in the format method. i.e. Calling
+ * Formats and parses tokens to/from a String. In most implementations tokens returned
+ * by the parse method abide by any restrictions present in the format method. That is, calling
  * format() with the results of a call to parse() on the same Case instance should return a
  * matching String.
  *
@@ -35,6 +35,7 @@ public interface Case {
      *
      * @param tokens string tokens to be formatted by this Case
      * @return the formatted string
+     * @throws IllegalArgumentException if tokens cannot be formatted
      */
     String format(Iterable<String> tokens);
 
@@ -42,8 +43,9 @@ public interface Case {
      * Parses a string into a series of tokens. The string must abide by certain restrictions,
      * dependent on each Case implementation.
      *
-     * @param string The string to be parsed by the Case into a list of tokens
-     * @return The list of parsed tokens
+     * @param string the string to be parsed by this Case into a list of tokens
+     * @return the list of parsed tokens
+     * @throws IllegalArgumentException if the string cannot be parsed
      */
     List<String> parse(String string);
 

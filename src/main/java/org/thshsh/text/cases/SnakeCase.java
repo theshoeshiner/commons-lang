@@ -22,18 +22,18 @@ package org.thshsh.text.cases;
  * SnakeCase is a delimited case where the delimiter is the underscore character '_'.
  * </p>
  */
-public class SnakeCase extends DelimitedCase {
+public final class SnakeCase extends CharacterDelimitedCase {
 
-    /** constant for delimiter. */
-    public static final char DELIMITER = '_';
+    /** Constant for delimiter. */
+    private static final char DELIMITER = '_';
 
-    /** constant reuseable instance of this case. */
+    /** Constant reusable instance of this case. */
     public static final SnakeCase INSTANCE = new SnakeCase();
 
     /**
      * Constructs a new SnakeCase instance.
      */
-    public SnakeCase() {
+    private SnakeCase() {
         super(DELIMITER);
     }
 
